@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>E-Voting | St. Andrews SMS</title>
+  <script>
+    let elections = [];
+    async function loadElections() {
+      elections = await (await fetch('http://localhost:3000/api/voting')).json();
+      const container = document.getElementById('elections');
+      elections.forEach(e => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <h2>${e.title}</h2>
+          ${e.choices.map(c => `
+            <label>
+              <input type="radio" name="vote_${e._id}" value="${c}"> ${c}
+            </label><br>
+          `).join('')}
+          <button onclick="castVote('${e._id}')">Vote</button>
+          <hr>
+        `;
+        container.append(div);
+      });
+    }
+
+    async function castVote(electionId) {
+      const choice = document.querySelector(
+        \`input[name=vote_\${electionId}]:checked\`
+      ).value;
+      await fetch(\`http://localhost:3000/api/voting/\${electionId}/vote\`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ choice })
+      });
+      alert('Your vote has been recorded');
+    }
+
+    window.addEventListener('DOMContentLoaded', loadElections);
+  </script>
+</head>
+<body>
+  <h1>Current Elections</h1>
+  <div id="elections"></div>
+</body>
+</html>

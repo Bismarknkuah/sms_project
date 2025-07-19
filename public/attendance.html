@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Class Attendance | St. Andrews SMS</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <!-- Chart.js for summary chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 1rem;
+      background: #f4f6f8;
+      color: #333;
+    }
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .controls > * {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    .controls select,
+    .controls input[type="date"],
+    .controls button,
+    .controls input[type="text"] {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    th {
+      background: #16355c;
+      color: #fff;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .chart-container {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Class Attendance</h1>
+
+  <div class="controls">
+    <label>
+      Class:
+      <select id="classSelect">
+        <option value="classA">Class A</option>
+        <option value="classB">Class B</option>
+        <option value="classC">Class C</option>
+      </select>
+    </label>
+
+    <label>
+      Date:
+      <input type="date" id="datePicker" />
+    </label>
+
+    <input type="text" id="searchInput" placeholder="Search student..." />
+
+    <button id="loadBtn">Load Roster</button>
+    <button id="markAllBtn">Mark All Present</button>
+    <button id="clearAllBtn">Clear All</button>
+    <button id="submitBtn">Submit</button>
+  </div>
+
+  <table id="attTable">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Name</th>
+        <th>Present</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="chart-container">
+    <canvas id="summaryChart"></canvas>
+  </div>
+
+  <script>
+    const apiBase = 'http://localhost:3000/api/attendance';
+    let currentRecords = [];
+
+    // Initialize date picker to today
+    document.getElementById('datePicker').valueAsDate = new Date();
+
+    // Load roster & existing attendance
+    async function loadRoster() {
+      const classId = document.getElementById('classSelect').value;
+      const date    = document.getElementById('datePicker').value;
+      // Fetch roster from your real API endpoint:
+      // e.g. /api/roster?classId=...
+      // For now stub:
+      const roster = [
+        { id:'stu1', name:'Alice' },
+        { id:'stu2', name:'Bob'   },
+        { id:'stu3', name:'Carol' }
+      ];
+
+      // Fetch existing attendance for the date/class
+      const res = await fetch(`${apiBase}?classId=${classId}&date=${date}`);
+      const existing = await res.json();
+      // Map to a lookup
+      const map = new Map(existing.map(r=>[r.studentId,r.present]));
+
+      // Build table
+      const tbody = document.querySelector('#attTable tbody');
+      tbody.innerHTML = '';
+      currentRecords = roster.map(s => ({
+        studentId: s.id,
+        name:      s.name,
+        present:   map.get(s.id) || false
+      }));
+      renderTable(currentRecords);
+      renderChart(currentRecords);
+    }
+
+    function renderTable(records) {
+      const tbody = document.querySelector('#attTable tbody');
+      const filter = document.getElementById('searchInput').value.toLowerCase();
+      tbody.innerHTML = '';
+      records
+        .filter(r => !filter || r.studentId.includes(filter) || r.name.toLowerCase().includes(filter))
+        .forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.studentId}</td>
+            <td>${r.name}</td>
+            <td><input type="checkbox" data-id="${r.studentId}" ${r.present?'checked':''}></td>
+          `;
+          tbody.append(tr);
+        });
+      // attach change handlers
+      tbody.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const id = cb.dataset.id;
+          const rec = currentRecords.find(x=>x.studentId===id);
+          rec.present = cb.checked;
+          renderChart(currentRecords);
+        });
+      });
+    }
+
+    function renderChart(records) {
+      const presentCount = records.filter(r=>r.present).length;
+      const absentCount  = records.length - presentCount;
+      const ctx = document.getElementById('summaryChart').getContext('2d');
+      if (window._chart) window._chart.destroy();
+      window._chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Present','Absent'],
+          datasets: [{
+            label: 'Count',
+            data: [presentCount, absentCount],
+            backgroundColor: ['#28a745','#dc3545']
+          }]
+        },
+        options: { responsive: true, legend:{display:false} }
+      });
+    }
+
+    async function submitAttendance() {
+      const classId = document.getElementById('classSelect').value;
+      const date    = document.getElementById('datePicker').value;
+      const records = currentRecords.map(r => ({
+        studentId: r.studentId,
+        present:   r.present
+      }));
+      await fetch(apiBase, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ classId, records })
+      });
+      alert('Attendance saved');
+    }
+
+    document.getElementById('loadBtn').addEventListener('click', loadRoster);
+    document.getElementById('searchInput').addEventListener('input', () => renderTable(currentRecords));
+    document.getElementById('markAllBtn').addEventListener('click', () => {
+      currentRecords.forEach(r=>r.present=true);
+      renderTable(currentRecords);
+      renderChart(currentRecords);
+    });
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      currentRecords.forEach(r=>r.present=false);
+      renderTable(currentRecords);
+      renderChart(currentRecords);
+    });
+    document.getElementById('submitBtn').addEventListener('click', submitAttendance);
+
+    // On page load, auto-load
+    window.addEventListener('DOMContentLoaded', loadRoster);
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Transport & Hostel – St. Andrews SMS</title>
+  <link rel="stylesheet" href="css/dashboard.css"/>
+  <!-- Simple modal styles: -->
+  <style>
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none; align-items: center; justify-content: center;
+      z-index: 2000;
+    }
+    .modal {
+      background: #fff; padding: 1.5rem; border-radius: 8px;
+      width: 100%; max-width: 400px; position: relative;
+    }
+    .modal header { font-size: 1.25rem; margin-bottom: 1rem; }
+    .modal .close-btn {
+      position: absolute; top: 0.5rem; right: 0.5rem;
+      background: none; border: none; font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .modal form > div { margin-bottom: 0.75rem; }
+    .modal label { display:block; margin-bottom:0.25rem; }
+    .modal input, .modal select {
+      width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;
+    }
+    .modal .actions { text-align: right; margin-top: 1rem; }
+    .modal .actions button { margin-left: 0.5rem; }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <script defer src="js/transport.js"></script>
+</head>
+<body class="dashboard-body">
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/images/logo.png" alt="Logo" class="logo"/>
+        <h2>St. Andrews SMS</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <!-- ...other links... -->
+          <li><a href="transport.html" class="active"><i class="fas fa-bus"></i> Transport & Hostel</a></li>
+          <!-- ... -->
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <header class="top-bar">
+        <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+        <h1>Transport & Hostel</h1>
+        <div class="top-bar-right">
+          <div class="notifications"><i class="fas fa-bell"></i><span class="notification-count">0</span></div>
+          <div class="user-menu">
+            <img src="assets/images/user-avatar.png" alt="User"/><span>Admin</span><i class="fas fa-chevron-down"></i>
+            <ul class="dropdown">
+              <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <section class="dashboard-content">
+        <div class="section-grid">
+
+          <!-- Bus Routes -->
+          <div class="section">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3>Bus Routes</h3>
+              <button id="open-route-modal" class="action-btn"><i class="fas fa-plus"></i> Add Route</button>
+            </div>
+            <input id="route-search" type="text" placeholder="Search routes..." style="margin:0.5rem 0;padding:0.5rem;width:100%;"/>
+            <table id="routes-table">
+              <thead>
+                <tr><th>Name</th><th>Branch</th><th>Driver</th><th>Vehicle#</th><th>Cap.</th><th>Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <!-- Hostels -->
+          <div class="section">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3>Hostels</h3>
+              <button id="open-hostel-modal" class="action-btn"><i class="fas fa-plus"></i> Add Hostel</button>
+            </div>
+            <input id="hostel-search" type="text" placeholder="Search hostels..." style="margin:0.5rem 0;padding:0.5rem;width:100%;"/>
+            <table id="hostels-table">
+              <thead>
+                <tr><th>Name</th><th>Branch</th><th>Cap.</th><th>Assign.</th><th>Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Route Modal -->
+  <div id="route-modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <button class="close-btn" data-close="route-modal-overlay">&times;</button>
+      <header>Add / Edit Route</header>
+      <form id="route-form">
+        <input type="hidden" name="id"/>
+        <div><label>Name</label><input name="routeName" required/></div>
+        <div><label>Branch</label>
+          <select name="branch" required>
+            <option>Assin Fosu</option><option>Accra Branch</option><option>Dunkwa Offin Branch</option>
+            <option>Asanwinso Branch</option><option>Magasim Branch</option>
+          </select>
+        </div>
+        <div><label>Driver Name</label><input name="driverName" required/></div>
+        <div><label>Vehicle #</label><input name="vehicleNumber" required/></div>
+        <div><label>Capacity</label><input name="capacity" type="number" min="1" required/></div>
+        <div class="actions">
+          <button type="button" data-close="route-modal-overlay">Cancel</button>
+          <button type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hostel Modal -->
+  <div id="hostel-modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <button class="close-btn" data-close="hostel-modal-overlay">&times;</button>
+      <header>Add / Edit Hostel</header>
+      <form id="hostel-form">
+        <input type="hidden" name="id"/>
+        <div><label>Name</label><input name="name" required/></div>
+        <div><label>Branch</label>
+          <select name="branch" required>
+            <option>Assin Fosu</option><option>Accra Branch</option><option>Dunkwa Offin Branch</option>
+            <option>Asanwinso Branch</option><option>Magasim Branch</option>
+          </select>
+        </div>
+        <div><label>Capacity</label><input name="capacity" type="number" min="1" required/></div>
+        <div class="actions">
+          <button type="button" data-close="hostel-modal-overlay">Cancel</button>
+          <button type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

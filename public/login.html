@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - St. Andrews SMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/forms.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <img src="../assets/images/logo.png" alt="St. Andrews Logo">
+                <h2>St. Andrews SMS</h2>
+                <p>School Management System</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="userType">Login As:</label>
+                    <select id="userType" name="userType" required>
+                        <option value="">Select User Type</option>
+                        <option value="admin">Administrator</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                        <option value="parent">Parent</option>
+                        <option value="accountant">Accountant</option>
+                        <option value="librarian">Librarian</option>
+                        <option value="transport">Transport Manager</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="branch">Branch:</label>
+                    <select id="branch" name="branch" required>
+                        <option value="">Select Branch</option>
+                        <option value="main">Main Campus - Assin Fosu</option>
+                        <option value="branch1">Branch 1</option>
+                        <option value="branch2">Branch 2</option>
+                        <option value="branch3">Branch 3</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username/ID:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+
+            <div class="login-footer">
+                <p><a href="index.html">← Back to Home</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+</body>
+</html>

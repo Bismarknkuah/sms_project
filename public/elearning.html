@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Learning Support - St. Andrews Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .course-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .course-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .course-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-instructor {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .course-body {
+            padding: 1.5rem;
+        }
+
+        .course-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .course-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item-number {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .stat-item-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .assignments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .assignment-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .assignment-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .assignment-info {
+            flex: 1;
+        }
+
+        .assignment-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .assignment-details {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .assignment-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+
+        .status-pending {
+            background: #feebc8;
+            color: #7b341e;
+        }
+
+        .status-submitted {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-overdue {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-graded {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #718096;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .resource-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: background 0.3s ease;
+        }
+
+        .resource-item:hover {
+            background: #edf2f7;
+        }
+
+        .resource-icon {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .assignment-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .assignment-status {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="stat-icon">💻</div>
+                <h1>St. Andrews E-Learning</h1>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html">← Main Dashboard</a></li>
+                    <li><a href="#" class="active">E-Learning Dashboard</a></li>
+                    <li><a href="#courses">My Courses</a></li>
+                    <li><a href="#assignments">Assignments</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                    <li><a href="#progress">Progress</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Dashboard Statistics -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number">12</div>
+                <div class="stat-label">Active Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">Pending Assignments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-number">85%</div>
+                <div class="stat-label">Overall Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-number">92</div>
+                <div class="stat-label">Average Grade</div>
+            </div>
+        </div>
+
+        <!-- Active Courses Section -->
+        <section class="content-section" id="courses">
+            <div class="section-header">
+                <h2 class="section-title">My Courses</h2>
+                <button class="btn btn-primary" onclick="openModal('addCourseModal')">
+                    ➕ Enroll in Course
+                </button>
+            </div>
+
+            <div class="courses-grid" id="coursesGrid">
+                <!-- Courses will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Assignments Section -->
+        <section class="content-section" id="assignments">
+            <div class="section-header">
+                <h2 class="section-title">Recent Assignments</h2>
+                <button class="btn btn-secondary">View All Assignments</button>
+            </div>
+
+            <div class="assignments-list" id="assignmentsList">
+                <!-- Assignments will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Learning Resources Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">Learning Resources</h2>
+                <button class="btn btn-success" onclick="openModal('uploadResourceModal')">
+                    📤 Upload Resource
+                </button>
+            </div>
+
+            <div class="resource-list" id="resourcesList">
+                <!-- Resources will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Course Details Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('courseModal')">&times;</span>
+            <div id="courseModalContent">
+                <!-- Course content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Course Modal -->
+    <div id="addCourseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addCourseModal')">&times;</span>
+            <h2 style="margin-bottom: 2rem;">Enroll in New Course</h2>
+            <form id="addCourseForm">
+                <div class="form-group">
+                    <label class="form-label" for="courseCode">Course Code</label>
+                    <input type="text" class="form-input" id="courseCode" placeholder="e.g., CS101" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="courseName">Course Name</label>
+                    <input type="text" class="form-input" id="courseName" placeholder="e.g., Introduction to Computer Science" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="courseInstructor">Instructor</label>
+                    <input type="text" class="form-input" id="courseInstructor" placeholder="Instructor name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="courseCategory">Category</label>
+                    <select class="form-select" id="courseCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="english">English</option>
+                        <option value="history">History</option>
+                        <option value="arts">Arts</option>
+                        <option value="technology">Technology</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCourseModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Enroll</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Resource Modal -->
+    <div id="uploadResourceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('uploadResourceModal')">&times;</span>
+            <h2 style="margin-bottom: 2rem;">Upload Learning Resource</h2>
+            <form id="uploadResourceForm">
+                <div class="form-group">
+                    <label class="form-label" for="resourceTitle">Resource Title</label>
+                    <input type="text" class="form-input" id="resourceTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="resourceType">Resource Type</label>
+                    <select class="form-select" id="resourceType" required>
+                        <option value="">Select Type</option>
+                        <option value="document">Document</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                        <option value="presentation">Presentation</option>
+                        <option value="link">External Link</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="resourceCourse">Related Course</label>
+                    <select class="form-select" id="resourceCourse" required>
+                        <option value="">Select Course</option>
+                        <option value="math101">Mathematics 101</option>
+                        <option value="eng102">English Literature 102</option>
+                        <option value="sci103">General Science 103</option>
+                        <option value="hist104">World History 104</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="resourceDescription">Description</label>
+                    <textarea class="form-textarea" id="resourceDescription" placeholder="Brief description of the resource"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('uploadResourceModal')">Cancel</button>
+                    <button type="submit" class="btn btn-success">Upload Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let courses = [
+            {
+                id: 1,
+                code: "MATH101",
+                title: "Advanced Mathematics",
+                instructor: "Dr. Sarah Johnson",
+                progress: 75,
+                lessons: 24,
+                assignments: 8,
+                grade: "A-",
+                category: "mathematics"
+            },
+            {
+                id: 2,
+                code: "ENG102",
+                title: "English Literature",
+                instructor: "Prof. Michael Brown",
+                progress: 60,
+                lessons: 18,
+                assignments: 6,
+                grade: "B+",
+                category: "english"
+            },
+            {
+                id: 3,
+                code: "SCI103",
+                title: "General Science",
+                instructor: "Dr. Emily Davis",
+                progress: 90,
+                lessons: 20,
+                assignments: 5,
+                grade: "A",
+                category: "science"
+            },
+            {
+                id: 4,
+                code: "HIST104",
+                title: "World History",
+                instructor: "Mr. James Wilson",
+                progress: 45,
+                lessons: 16,
+                assignments: 4,
+                grade: "B",
+                category: "history"
+            }
+        ];
+
+        let assignments = [
+            {
+                id: 1,
+                title: "Calculus Problem Set #3",
+                course: "Advanced Mathematics",
+                dueDate: "2025-06-20",
+                status: "pending",
+                type: "Homework"
+            },
+            {
+                id: 2,
+                title: "Shakespeare Essay Analysis",
+                course: "English Literature",
+                dueDate: "2025-06-18",
+                status: "submitted",
+                type: "Essay"
+            },
+            {
+                id: 3,
+                title: "Chemistry Lab Report",
+                course: "General Science",
+                dueDate: "2025-06-15",
+                status: "overdue",
+                type: "Lab Report"
+            },
+            {
+                id: 4,
+                title: "World War II Timeline",
+                course: "World History",
+                dueDate: "2025-06-25",
+                status: "graded",
+                type: "Project",
+                grade: "92%"
+            }
+        ];
+
+        let resources = [
+            {
+                id: 1,
+                title: "Advanced Calculus Tutorial Videos",
+                type: "video",
+                course: "Mathematics 101",
+                icon: "🎥"
+            },
+            {
+                id: 2,
+                title: "Shakespeare Complete Works PDF",
+                type: "document",
+                course: "English Literature 102",
+                icon: "📄"
+            },
+            {
+                id: 3,
+                title: "Periodic Table Interactive Guide",
+                type: "link",
+                course: "General Science 103",
+                icon: "🔗"
+            },
+            {
+                id: 4,
+                title: "Historical Timeline Presentation",
+                type: "presentation",
+                course: "World History 104",
+                icon: "📊"
+            }
+        ];
+
+        // Render courses
+        function renderCourses() {
+            const coursesGrid = document.getElementById('coursesGrid');
+            coursesGrid.innerHTML = '';
+
+            courses.forEach(course => {
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card';
+                courseCard.innerHTML = `
+                    <div class="course-header">
+                        <div class="course-title">${course.title}</div>
+                        <div class="course-instructor">by ${course.instructor}</div>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-progress">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>${course.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${course.progress}%"></div>
+                            </div>
+                        </div>
+                        <div class="course-stats">
+                            <div class="stat-item">
+                                <div class="stat-item-number">${course.lessons}</div>
+                                <div class="stat-item-label">Lessons</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-item-number">${course.assignments}</div>
+                                <div class="stat-item-label">Assignments</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-item-number">${course.grade}</div>
+                                <div class="stat-item-label">Grade</div>
+                            </div>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary btn-small" onclick="openCourse(${course.id})">Continue Learning</button>
+                            <button class="btn btn-secondary btn-small" onclick="viewCourseDetails(${course.id})">View Details</button>
+                        </div>
+                    </div>
+                `;
+                coursesGrid.appendChild(courseCard);
+            });
+        }
+
+        // Render assignments
+        function renderAssignments() {
+            const assignmentsList = document.getElementById('assignmentsList');
+            assignmentsList.innerHTML = '';
+
+            assignments.forEach(assignment => {
+                const assignmentItem = document.createElement('div');
+                assignmentItem.className = 'assignment-item';
+                assignmentItem.innerHTML = `
+                    <div class="assignment-info">
+                        <div class="assignment-title">${assignment.title}</div>
+                        <div class="assignment-details">
+                            ${assignment.course} • ${assignment.type} • Due: ${assignment.dueDate}
+                            ${assignment.grade ? ` • Grade: ${assignment.grade}` : ''}
+                        </div>
+                    </div>
+                    <div class="assignment-status status-${assignment.status}">
+                        ${assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                    </div>
+                `;
+                assignmentsList.appendChild(assignmentItem);
+            });
+        }
+
+        // Render resources
+        function renderResources() {
+            const resourcesList = document.getElementById('resourcesList');
+            resourcesList.innerHTML = '';
+
+            resources.forEach(resource => {
+                const resourceItem = document.createElement('a');
+                resourceItem.className = 'resource-item';
+                resourceItem.href = '#';
+                resourceItem.innerHTML = `
+                    <div class="resource-icon">${resource.icon}</div>
+                    <div>
+                        <div style="font-weight: 500;">${resource.title}</div>
+                        <div style="font-size: 0.85rem; color: #718096;">${resource.course}</div>
+                    </div>
+                `;
+                resourcesList.appendChild(resourceItem);
+            });
+        }
+
+        // Course functions
+        function openCourse(courseId) {
+            const course = courses.find(c => c.id === courseId);
+            if (course) {
+                const modalContent = document.getElementById('courseModalContent');
+                modalContent.innerHTML = `
+                    <h2>${course.title}</h2>
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('lessons')">Lessons</button>
+                        <button class="tab" onclick="switchTab('assignments')">Assignments</button>
+                        <button class="tab" onclick="switchTab('resources')">Resources</button>
+                    </div>
+
+                    <div id="lessons" class="tab-content active">
+                        <div class="video-player">
+                            📹 Video Player - Lesson ${Math.floor(course.progress / 100 * course.lessons) + 1}
+                        </div>
+                        <h3>Current Lesson: Introduction to ${course.title}</h3>
+                        <p>Continue your learning journey with interactive lessons and practical examples.</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;">Mark as Complete</button>
+                    </div>
+
+                    <div id="assignments" class="tab-content">
+                        <h3>Course Assignments</h3>
+                        <p>Complete assignments to test your understanding and earn grades.</p>
+                        <div style="margin-top: 1rem;">
+                            ${assignments.filter(a => a.course === course.title).map(a => `
+                                <div class="assignment-item" style="margin-bottom: 1rem;">
+                                    <div class="assignment-info">
+                                        <div class="assignment-title">${a.title}</div>
+                                        <div class="assignment-details">Due: ${a.dueDate}</div>
+                                    </div>
+                                    <div class="assignment-status status-${a.status}">${a.status}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
