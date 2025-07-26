@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile - St. Andrews SHS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>St. Andrews Senior High School</h1>
+    <p>Branch: <%= branch.name %></p>
+    <p>Date: <%= new Date().toLocaleDateString('en-GB', { timeZone: 'GMT' }) %></p>
+  </header>
+  <main>
+    <h2>Student Profile</h2>
+    <div class="profile-card">
+      <p><strong>Full Name:</strong> <%= student.fullName %></p>
+      <p><strong>Student ID:</strong> <%= student.studentId %></p>
+      <p><strong>Type:</strong> <%= student.studentType %></p>
+      <p><strong>House:</strong> <%= student.houseId ? house.name : 'N/A' %></p>
+      <p><strong>Course:</strong> <%= course.title %></p>
+      <p><strong>Parent:</strong> <%= parent.fullName %></p>
+      <p><strong>Contact:</strong> <%= parent.phoneNumber %></p>
+      <h3>Attendance Summary</h3>
+      <ul>
+        <% attendance.forEach(att => { %>
+          <li><%= att.date.toLocaleDateString() %> - <%= att.status %></li>
+        <% }); %>
+      </ul>
+      <h3>Financial Status</h3>
+      <ul>
+        <% finance.forEach(fin => { %>
+          <li><%= fin.transactionType %>: GHS <%= fin.amount %> - <%= fin.status %></li>
+        <% }); %>
+      </ul>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> St. Andrews SHS. All rights reserved.</p>
+  </footer>
+</body>
+</html>

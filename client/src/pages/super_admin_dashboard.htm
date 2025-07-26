@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin Dashboard - St. Andrews SMS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/dashboard.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+    }
+
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 300px;
+      background: linear-gradient(180deg, #1a1f36 0%, #2d3561 100%);
+      color: white;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 25px 20px;
+      text-align: center;
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 28px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .sidebar-header small {
+      opacity: 0.9;
+      font-size: 0.9rem;
+      color: #feca57;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 20px 0;
+    }
+
+    .nav-section {
+      margin-bottom: 25px;
+    }
+
+    .nav-section-title {
+      padding: 0 25px 10px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a0aec0;
+      font-weight: 600;
+    }
+
+    .sidebar-nav li a {
+      display: flex;
+      align-items: center;
+      padding: 15px 25px;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+      position: relative;
+    }
+
+    .sidebar-nav li.active a,
+    .sidebar-nav li a:hover {
+      background: linear-gradient(90deg, rgba(255,107,107,0.2), rgba(254,202,87,0.2));
+      border-left: 4px solid #feca57;
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav li.active a {
+      background: linear-gradient(90deg, #ff6b6b, #feca57);
+      box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+    }
+
+    .sidebar-nav i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: #ff6b6b;
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 300px;
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+
+    .top-bar {
+      background: white;
+      padding: 20px 35px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      font-size: 22px;
+      margin-right: 20px;
+      cursor: pointer;
+      color: #64748b;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .top-bar h1 {
+      color: #1e293b;
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box input {
+      padding: 10px 40px 10px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 25px;
+      width: 300px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-box i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+
+    .notification-panel {
+      position: relative;
+    }
+
+    .notification-icon {
+      position: relative;
+      color: #64748b;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .notification-icon:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 12px;
+      min-width: 18px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .notification-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      width: 350px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .notification-dropdown.active {
+      display: block;
+    }
+
+    .notification-item {
+      padding: 15px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .notification-item:hover {
+      background: #f8fafc;
+    }
+
+    .notification-item i {
+      font-size: 18px;
+      color: #667eea;
+    }
+
+    .notification-item p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #1e293b;
+    }
+
+    .notification-item .dismiss {
+      margin-left: auto;
+      font-size: 14px;
+      color: #ef4444;
+      cursor: pointer;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .user-info:hover {
+      background: #f8fafc;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .user-details h4 {
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-details p {
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+
+    .stat-card.total-branches { --card-color: #667eea; --card-color-light: #764ba2; }
+    .stat-card.total-students { --card-color: #ff6b6b; --card-color-light: #ee5a52; }
+    .stat-card.total-staff { --card-color: #4ecdc4; --card-color-light: #44a08d; }
+    .stat-card.total-revenue { --card-color: #feca57; --card-color-light: #ff9ff3; }
+
+    .stat-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .stat-info h3 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .stat-info p {
+      color: #64748b;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .stat-change {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    .stat-change.positive { color: #10b981; }
+    .stat-change.negative { color: #ef4444; }
+
+    .content-section {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: #667eea;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .branches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    .branch-card {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 25px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .branch-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+      transform: translateY(-3px);
+    }
+
+    .branch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .branch-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .branch-status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .branch-status.active { background: #dcfce7; color: #166534; }
+    .branch-status.maintenance { background: #fef3c7; color: #92400e; }
+
+    .branch-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .branch-stat {
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .branch-stat h4 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 5px;
+    }
+
+    .branch-stat p {
+      color: #64748b;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .branch-admin {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .admin-info h5 {
+      color: #1e293b;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .admin-info p {
+      color: #64748b;
+      font-size: 0.8rem;
+    }
+
+    .branch-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-view { background: #e0e7ff; color: #3730a3; }
+    .btn-edit { background: #fef3c7; color: #92400e; }
+    .btn-control { background: #dcfce7; color: #166534; }
+
+    .btn-small:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .chart-container {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .chart-container canvas {
+      max-height: 300px;
+    }
+
+    .chart-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .activity-feed {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 15px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 16px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .activity-icon.admin { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .activity-icon.student { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+    .activity-icon.finance { background: linear-gradient(135deg, #feca57, #ff9ff3); }
+    .activity-icon.system { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+
+    .activity-content h4 {
+      color: #1e293b;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .activity-content p {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .activity-time {
+      color: #94a3b8;
+      font-size: 0.8rem;
+    }
+
+    .audit-log {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .audit-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .audit-item:last-child {
+      border-bottom: none;
+    }
+
+    .audit-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-size: 14px;
+      color: white;
+      background: #667eea;
+    }
+
+    .audit-details p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #1e293b;
+    }
+
+    .audit-time {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+      color: #1e293b;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #64748b;
+    }
+
+    .modal-close:hover {
+      color: #ef4444;
+    }
+
+    .modal-body .form-group {
+      margin-bottom: 15px;
+    }
+
+    .modal-body label {
+      display: block;
+      font-size: 0.9rem;
+      color: #1e293b;
+      margin-bottom: 5px;
+    }
+
+    .modal-body input, .modal-body select, .modal-body textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .modal-body textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #64748b;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      color: #1e293b;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .tab:hover {
+      color: #1e293b;
+    }
+
+    .chat-container {
+      display: flex;
+      height: 500px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .chat-sidebar {
+      width: 200px;
+      background: #f1f5f9;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .chat-user {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .chat-user:hover, .chat-user.active {
+      background: #e0e7ff;
+    }
+
+    .chat-user .avatar {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      padding: 15px;
+    }
+
+    .chat-header {
+      padding: 10px;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .chat-message {
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-message.sent {
+      align-items: flex-end;
+    }
+
+    .chat-message.received {
+      align-items: flex-start;
+    }
+
+    .chat-message p {
+      max-width: 70%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .chat-message.sent p {
+      background: #667eea;
+      color: white;
+    }
+
+    .chat-message.received p {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .chat-message .time {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .chat-input button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .chat-input button:hover {
+      background: #5a67d8;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { width: 250px; }
+      .main-content { margin-left: 250px; }
+      .analytics-grid { grid-template-columns: 1fr; }
+      .chat-container { flex-direction: column; }
+      .chat-sidebar { width: 100%; max-height: 200px; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .stats-grid, .branches-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-box input {
+        width: 200px;
+      }
+
+      .dashboard-content {
+        padding: 20px;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    }
+  </style>
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><img src="/assets/logo.svg" alt="Logo"></div>
+      <h2>St. Andrews SMS</h2>
+      <small>Super Administrator</small>
+    </div>
+    <ul class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <li class="active"><a href="#" onclick="loadSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="#" onclick="loadSection('analytics')"><i class="fas fa-chart-line"></i> Analytics</a></li>
+        <li><a href="#" onclick="loadSection('reports')"><i class="fas fa-flag"></i> Reports</a></li>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Management</div>
+        <li><a href="#" onclick="loadSection('branches')"><i class="fas fa-building"></i> Branch Control <span class="nav-badge" id="branchCount">7</span></a></li>
+        <li><a href="#" onclick="openUserModal('add')"><i class="fas fa-user-tie"></i> User Management</a></li>
+        <li><a href="#" onclick="loadSection('students')"><i class="fas fa-users"></i> All Students</a></li>
+        <li><a href="#" onclick="loadSection('staff')"><i class="fas fa-chalkboard-teacher"></i> All Staff</a></li>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Financial</div>
+        <li><a href="#" onclick="loadSection('finance')"><i class="fas fa-money-bill-wave"></i> Global Finance</a></li>
+        <li><a href="#" onclick="loadSection('payments')"><i class="fas fa-credit-card"></i> Payments</a></li>
+        <li><a href="#" onclick="loadSection('invoicing')"><i class="fas fa-receipt"></i> Invoicing</a></li>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System</div>
+        <li><a href="#" onclick="loadSection('settings')"><i class="fas fa-cog"></i> System Settings</a></li>
+        <li><a href="#" onclick="loadSection('security')"><i class="fas fa-shield-alt"></i> Security</a></li>
+        <li><a href="#" onclick="loadSection('backup')"><i class="fas fa-database"></i> Backup & Restore</a></li>
+        <li><a href="#" onclick="loadSection('notifications')"><i class="fas fa-bell"></i> Notifications <span class="nav-badge" id="notificationCount">0</span></a></li>
+        <li><a href="#" onclick="loadSection('communication')"><i class="fas fa-comments"></i> Communication Hub</a></li>
+        <li><a href="#" onclick="loadSection('audit')"><i class="fas fa-history"></i> Audit Log</a></li>
+        <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </div>
+    </ul>
+  </aside>
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1>Super Admin Dashboard</h1>
+      </div>
+      <div class="top-bar-right">
+        <div class="search-box">
+          <input type="text" placeholder="Search branches, admins, students..." oninput="searchDashboard(this.value)">
+          <i class="fas fa-search"></i>
+        </div>
+        <div class="notification-panel">
+          <div class="notification-icon" onclick="toggleNotifications()">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationBadge">0</span>
+          </div>
+          <div class="notification-dropdown" id="notificationDropdown">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">SA</div>
+          <div class="user-details">
+            <h4 id="userName">Super Admin</h4>
+            <p>System Administrator</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="dashboard-content" id="dashboardContent">
+      <div class="stats-grid">
+        <div class="stat-card total-branches">
+          <div class="stat-icon"><i class="fas fa-building"></i></div>
+          <div class="stat-info">
+            <h3 id="totalBranches">0</h3>
+            <p>Total Branches</p>
+            <div class="stat-change positive" id="branchChange"></div>
+          </div>
+        </div>
+        <div class="stat-card total-students">
+          <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+          <div class="stat-info">
+            <h3 id="totalStudents">0</h3>
+            <p>Total Students</p>
+            <div class="stat-change positive" id="studentChange"></div>
+          </div>
+        </div>
+        <div class="stat-card total-staff">
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div class="stat-info">
+            <h3 id="totalStaff">0</h3>
+            <p>Total Staff</p>
+            <div class="stat-change positive" id="staffChange"></div>
+          </div>
+        </div>
+        <div class="stat-card total-revenue">
+          <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+          <div class="stat-info">
+            <h3 id="totalRevenue">₵0</h3>
+            <p>Total Revenue</p>
+            <div class="stat-change positive" id="revenueChange"></div>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-grid">
+        <div class="chart-container">
+          <div class="section-header">
+            <h3 class="section-title"><i class="fas fa-chart-area"></i> Revenue Trends by Branch</h3>
+            <div class="chart-controls">
+              <select id="dateRange" onchange="updateChart()">
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+              <button class="btn btn-secondary" onclick="exportChart()"><i class="fas fa-download"></i> Export</button>
+            </div>
+          </div>
+          <canvas id="revenueChart"></canvas>
+        </div>
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title"><i class="fas fa-bell"></i> Recent System Activity</h3>
+          </div>
+          <div class="activity-feed" id="activityFeed">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+      <div class="content-section">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fas fa-building"></i> Branch Control Center</h2>
+          <div class="section-actions">
+            <button class="btn btn-secondary" onclick="exportReport('branches')"><i class="fas fa-download"></i> Export Report</button>
+            <button class="btn btn-primary" onclick="openBranchModal('add')"><i class="fas fa-plus"></i> Add New Branch</button>
+          </div>
+        </div>
+        <div class="branches-grid" id="branchesGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      <div class="content-section">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fas fa-history"></i> System Audit Log</h2>
+          <div class="section-actions">
+            <button class="btn btn-secondary" onclick="filterLogs()"><i class="fas fa-filter"></i> Filter Logs</button>
+          </div>
+        </div>
+        <div class="audit-log" id="auditLog">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="modal" id="userModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add New User</h3>
+      <button class="modal-close" onclick="closeModal('userModal')">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="userUsername">Username</label>
+        <input type="text" id="userUsername" required>
+      </div>
+      <div class="form-group">
+        <label for="userPassword">Password</label>
+        <input type="password" id="userPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="userFullName">Full Name</label>
+        <input type="text" id="userFullName" required>
+      </div>
+      <div class="form-group">
+        <label for="userRole">Role</label>
+        <select id="userRole" required>
+          <option value="super_admin">Super Admin</option>
+          <option value="branch_admin">Branch Admin</option>
+          <option value="accountant">Accountant</option>
+          <option value="transport_manager">Transport Manager</option>
+          <option value="house_master">House Master</option>
+          <option value="librarian">Librarian</option>
+          <option value="staff">Staff</option>
+          <option value="headmaster">Headmaster</option>
+          <option value="pta_chairman">PTA Chairman</option>
+          <option value="student">Student</option>
+          <option value="it_admin">IT Admin</option>
+          <option value="security_officer">Security Officer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="userBranch">Branch</label>
+        <select id="userBranch">
+          <option value="">No Branch (Super Admin)</option>
+          <option value="assin_fosu">Assin Fosu</option>
+          <option value="accra">Accra</option>
+          <option value="dunkwa_on_offin">Dunkwa-on-Offin</option>
+          <option value="mankessim">Mankessim</option>
+          <option value="sefwi_asawinso">Sefwi Asawinso</option>
+          <option value="takoradi">Takoradi</option>
+          <option value="new_edubiase">New Edubiase</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUser()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="branchModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="branchModalTitle">Add New Branch</h3>
+      <button class="modal-close" onclick="closeModal('branchModal')">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="branchName">Branch Name</label>
+        <input type="text" id="branchName" required>
+      </div>
+      <div class="form-group">
+        <label for="branchLocation">Location</label>
+        <input type="text" id="branchLocation" required>
+      </div>
+      <div class="form-group">
+        <label for="branchAdmin">Branch Admin (Optional)</label>
+        <select id="branchAdmin">
+          <option value="">Select Admin</option>
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('branchModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBranch()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="messageModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Send Message</h3>
+      <button class="modal-close" onclick="closeModal('messageModal')">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="messageRecipient">Recipient</label>
+        <select id="messageRecipient" onchange="toggleRecipientFields()">
+          <option value="user">Specific User</option>
+          <option value="role">Role</option>
+          <option value="branch">Branch</option>
+          <option value="all">All Users</option>
+        </select>
+      </div>
+      <div class="form-group" id="userSelectGroup">
+        <label for="userSelect">Select User</label>
+        <select id="userSelect">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+      <div class="form-group" id="roleSelectGroup" style="display: none;">
+        <label for="roleSelect">Select Role</label>
+        <select id="roleSelect">
+          <option value="branch_admin">Branch Admin</option>
+          <option value="accountant">Accountant</option>
+          <option value="transport_manager">Transport Manager</option>
+          <option value="house_master">House Master</option>
+          <option value="librarian">Librarian</option>
+          <option value="staff">Staff</option>
+          <option value="headmaster">Headmaster</option>
+          <option value="pta_chairman">PTA Chairman</option>
+          <option value="student">Student</option>
+          <option value="it_admin">IT Admin</option>
+          <option value="security_officer">Security Officer</option>
+        </select>
+      </div>
+      <div class="form-group" id="branchSelectGroup" style="display: none;">
+        <label for="branchSelect">Select Branch</label>
+        <select id="branchSelect">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="messageContent">Message</label>
+        <textarea id="messageContent" required></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('messageModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="updateModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Send Update</h3>
+      <button class="modal-close" onclick="closeModal('updateModal')">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="updateRecipient">Recipient</label>
+        <select id="updateRecipient">
+          <option value="branch_admins">All Branch Admins</option>
+          <option value="all">All Users</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="updateTitle">Title</label>
+        <input type="text" id="updateTitle" required>
+      </div>
+      <div class="form-group">
+        <label for="updateContent">Update Content</label>
+        <textarea id="updateContent" required></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('updateModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendUpdate()">Send</button>
+    </div>
+  </div>
+</div>
+<script src="/scripts/super_admin_dashboard.js"></script>
+</body>
+</html>

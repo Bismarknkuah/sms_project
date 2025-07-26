@@ -1,72 +1,134 @@
-// server.js
-require('dotenv').config();
-const path    = require('path');
 const express = require('express');
-const cors    = require('cors');
-const mongoose = require('mongoose');
-const jwt     = require('jsonwebtoken');
-
-// your route modules
-const academicRoutes      = require('./academicRoutes');
-const analyticsRoutes     = require('./analyticsRoutes');
-const communicationRoutes = require('./communicationRoutes');
-const elearningRoutes     = require('./elearningRoutes');
-const financeRoutes       = require('./financeRoutes');
-const libraryRoutes       = require('./libraryRoutes');
-const staffRoutes         = require('./staffRoutes');
-const studentRoutes       = require('./studentRoutes');
-const transportRoutes     = require('./transportHostelRoutes');
-const authRoutes          = require('./auth');        // assume you have auth.js exporting router
+const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
+const session = require('express-session');
+const path = require('path');
 
 const app = express();
-
-// MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// global middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// serve front-end
-app.use(express.static(path.join(__dirname, 'public')));
-
-// mount auth first
-app.use('/api/auth', authRoutes);
-
-// simple JWT auth middleware
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api/auth')) return next();
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'No token' });
-  const token = authHeader.split(' ')[1];
-  jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
-    if (err) return res.status(401).json({ message: 'Invalid token' });
-    req.user = payload;
-    next();
-  });
-});
-
-// mount your APIs
-app.use('/api/academics',      academicRoutes);
-app.use('/api/analytics',      analyticsRoutes);
-app.use('/api/communication',  communicationRoutes);
-app.use('/api/elearning',      elearningRoutes);
-app.use('/api/finance',        financeRoutes);
-app.use('/api/library',        libraryRoutes);
-app.use('/api/staff',          staffRoutes);
-app.use('/api/student',        studentRoutes);
-app.use('/api/transport',      transportRoutes);
-
-// fallback to index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
-});
-
 const PORT = process.env.PORT || 3000;
+
+// MySQL Connection
+const db = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '', // replace with your DB password
+    database: 'st_andrews_sms'
+});
+
+// Middleware
+app.use(express.json());
+app.use(session({
+    secret: 'sms_secret_key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
+
+// Serve static files from 'public'
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+console.log(`✅ Static files served from ${publicPath}`);
+
+// Default route to serve login.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(publicPath, 'login.html'));
+});
+
+// LOGIN ENDPOINT
+app.post('/login', async (req, res) => {
+    const { userType, branch, username, password } = req.body;
+    console.log(`Login attempt: ${username} as ${userType} in branch: ${branch}`);
+
+    try {
+        let query = `
+            SELECT * FROM users
+            WHERE (username = ? OR email = ?)
+            AND userType = ?
+        `;
+        let params = [username, username, userType];
+
+        if (userType.toLowerCase() !== 'superadmin') {
+            query += ' AND branch = ?';
+            params.push(branch);
+        }
+
+        const [rows] = await db.execute(query, params);
+
+        if (rows.length === 0) {
+            console.warn('Login failed: user not found.');
+            return res.status(401).json({ message: 'User not found or invalid credentials.' });
+        }
+
+        const user = rows[0];
+        console.log('User found:', user.username);
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            console.warn(`Incorrect password for user: ${username}`);
+            return res.status(401).json({ message: 'Invalid password.' });
+        }
+
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            userType: user.userType
+        };
+
+        console.log(`Login successful: ${user.username} (${user.userType})`);
+
+        res.json({
+            message: 'Login successful!',
+            redirectUrl: `/dashboard/${user.userType}`
+        });
+
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error during login.', error: error.message });
+    }
+});
+
+// SERVE DASHBOARDS
+app.get('/dashboard/:userType', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).send('Unauthorized. Please login.');
+    }
+
+    const dashboards = {
+        superadmin: 'superadmin.html',
+        admin: 'admin.html',
+        teacher: 'teacher.html',
+        student: 'student.html',
+        parent: 'parent.html',
+        accountant: 'accountant.html',
+        librarian: 'librarian.html',
+        transport: 'transport-manager.html',
+        driver: 'driver.html'
+    };
+
+    const userType = req.params.userType.toLowerCase();
+    const dashboardFile = dashboards[userType];
+
+    if (dashboardFile) {
+        console.log(`Serving dashboard for ${userType}`);
+        return res.sendFile(path.join(publicPath, 'dashboards', dashboardFile));
+    } else {
+        console.warn(`Dashboard not found for userType: ${userType}`);
+        return res.status(404).send('Dashboard not available for this role.');
+    }
+});
+
+// LOGOUT
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).send('Error logging out.');
+        }
+        res.redirect('/login.html');
+    });
+});
+
+// START SERVER
 app.listen(PORT, () => {
-  console.log(`🚀 SMS API + UI running at http://localhost:${PORT}`);
+    console.log(`✅ Server running on http://localhost:${PORT}`);
 });

@@ -1,0 +1,92 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=1in}
+\sisetup{group-separator={,}, output-decimal-marker={.}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{St. Andrews School Management System}
+\fancyhead[R]{\today}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\definecolor{twilight}{RGB}{75,60,142}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\color{twilight}\huge\bfseries PTA Dashboard Report \\ St. Andrews SMS \par}
+    \vspace{1cm}
+    {\Large\itshape Branch: All Branches \par}
+    \vspace{0.5cm}
+    {\large Generated on \today \par}
+    \vspace{2cm}
+    {\large Prepared by: PTA Admin \par}
+\end{titlepage}
+
+\section*{PTA Summary Report}
+This report provides an overview of PTA operations for St. Andrews School Management System for the period ending \today.
+
+\subsection*{Dues Overview}
+\begin{tabular}{l S[table-format=5.0] c c}
+    \toprule
+    \textbf{Branch} & \textbf{Total Dues (GHS)} & \textbf{Paid (\%)} & \textbf{Overdue} \\
+    \midrule
+    Assin Fosu & 15000 & 85 & 10 \\
+    Accra & 20000 & 90 & 5 \\
+    Dunkwa-on-Offin & 10000 & 80 & 15 \\
+    Mankessim & 18000 & 88 & 8 \\
+    Sefwi Asawinso & 8000 & 75 & 20 \\
+    Takoradi & 22000 & 92 & 4 \\
+    New Edubiase & 12000 & 82 & 12 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Meeting Summary}
+\begin{tabular}{l c c}
+    \toprule
+    \textbf{Branch} & \textbf{Meetings Held} & \textbf{Avg. Attendance} \\
+    \midrule
+    Assin Fosu & 5 & 50 \\
+    Accra & 4 & 60 \\
+    Dunkwa-on-Offin & 3 & 40 \\
+    Mankessim & 6 & 55 \\
+    Sefwi Asawinso & 2 & 30 \\
+    Takoradi & 5 & 65 \\
+    New Edubiase & 4 & 45 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Notification Summary}
+\begin{tabular}{l c c}
+    \toprule
+    \textbf{Branch} & \textbf{Email Sent} & \textbf{SMS Sent} \\
+    \midrule
+    Assin Fosu & 100 & 50 \\
+    Accra & 120 & 60 \\
+    Dunkwa-on-Offin & 80 & 40 \\
+    Mankessim & 110 & 55 \\
+    Sefwi Asawinso & 60 & 30 \\
+    Takoradi & 130 & 65 \\
+    New Edubiase & 90 & 45 \\
+    \bottomrule
+\end{tabular}
+
+\section*{Consolidated PTA Metrics}
+\begin{tabular}{l S[table-format=6.0] c}
+    \toprule
+    \textbf{Metric} & \textbf{Value} & \textbf{Percentage (\%)} \\
+    \midrule
+    Total Dues (GHS) & 95000 & 100 \\
+    Paid Dues & 83250 & 87.6 \\
+    Average Attendance & 49.3 & -- \\
+    \bottomrule
+\end{tabular}
+
+\end{document}

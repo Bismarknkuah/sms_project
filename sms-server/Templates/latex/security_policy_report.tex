@@ -1,0 +1,63 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=1in}
+\sisetup{group-separator={,}, output-decimal-marker={.}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{St. Andrews School Management System}
+\fancyhead[R]{\today}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\definecolor{twilight}{RGB}{75,60,142}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\color{twilight}\huge\bfseries Security Policy Report \\ St. Andrews SMS \par}
+    \vspace{1cm}
+    {\Large\itshape Branch: ${branchName || 'All Branches'} \par}
+    \vspace{0.5cm}
+    {\large Generated on \today \par}
+    \vspace{2cm}
+    {\large Prepared by: ${userName || 'Security Admin'} \par}
+\end{titlepage}
+
+\section*{Security Policy Report}
+This report provides a comprehensive overview of security roles, permissions, and policies for St. Andrews School Management System as of \today.
+
+\subsection*{Role Assignments}
+\begin{tabular}{l l l}
+    \toprule
+    \textbf{Role} & \textbf{Branch} & \textbf{Permissions} \\
+    \midrule
+    ${roles.map(role => `${role.name} & ${role.branchName || 'Global'} & ${role.permissions.join(', ')}`).join(' \\\\')}
+    \bottomrule
+\end{tabular}
+
+\subsection*{Permission Matrix}
+\begin{tabular}{l ${'c'.repeat(modules.length)}}
+    \toprule
+    \textbf{Role} & ${modules.map(module => `\\textbf{${module}}`).join(' & ')} \\
+    \midrule
+    ${roles.map(role => `${role.name} & ${modules.map(module => role.permissions.includes(module) ? '✓' : '').join(' & ')}`).join(' \\\\')}
+    \bottomrule
+\end{tabular}
+
+\subsection*{Security Policies}
+\begin{tabular}{l l p{5cm}}
+    \toprule
+    \textbf{Policy} & \textbf{Scope} & \textbf{Rules} \\
+    \midrule
+    ${policies.map(policy => `${policy.name} & ${policy.scope} & ${JSON.stringify(policy.rules).replace(/"/g, '')}`).join(' \\\\')}
+    \bottomrule
+\end{tabular}
+
+\end{document}

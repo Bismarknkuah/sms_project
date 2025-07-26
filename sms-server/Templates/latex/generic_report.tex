@@ -1,0 +1,54 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=1in}
+\sisetup{group-separator={,}, output-decimal-marker={.}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{St. Andrews School Management System}
+\fancyhead[R]{\today}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\definecolor{twilight}{RGB}{75,60,142}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\color{twilight}\huge\bfseries ${reportType} Report \\ St. Andrews SMS \par}
+    \vspace{1cm}
+    {\Large\itshape Branch: ${branchName || 'All Branches'} \par}
+    \vspace{0.5cm}
+    {\large Generated on \today \par}
+    \vspace{2cm}
+    {\large Prepared by: ${userName || 'Report Admin'} \par}
+\end{titlepage}
+
+\section*{${reportType} Summary Report}
+This report provides an overview of ${reportType.toLowerCase()} for St. Andrews School Management System for the period from ${startDate} to ${endDate}.
+
+\subsection*{Summary Metrics}
+\begin{tabular}{l S[table-format=6.0] c}
+    \toprule
+    \textbf{Metric} & \textbf{Value} & \textbf{Percentage (\%)} \\
+    \midrule
+    ${summaryMetrics.map(metric => `${metric.name} & ${metric.value} & ${metric.percentage || '--'}`).join(' \\\\')}
+    \bottomrule
+\end{tabular}
+
+\subsection*{Branch-wise Breakdown}
+\begin{tabular}{l ${'S[table-format=5.0]'.repeat(metrics.length)}}
+    \toprule
+    \textbf{Branch} & ${metrics.map(metric => `\\textbf{${metric}}`).join(' & ')} \\
+    \midrule
+    ${branches.map(branch => `${branch.name} & ${metrics.map(metric => branch[metric.toLowerCase()] || 0).join(' & ')}`).join(' \\\\')}
+    \bottomrule
+\end{tabular}
+
+\end{document}

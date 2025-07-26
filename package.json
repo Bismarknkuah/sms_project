@@ -1,32 +1,113 @@
 {
-  "name": "st-andrews-senior-high-school-management-system",
+  "name": "st-andrews-sms",
   "version": "1.0.0",
-  "private": true,
-  "description": "Management system for St. Andrews Senior High School – backend API + frontend UI",
-  "main": "src/index.js",
+  "description": "St. Andrews School Management System - Complete Solution",
+  "main": "sms-server/app.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon",
-    "test": "jest --runInBand",
-    "lint": "eslint ."
+    "start": "npm run server",
+    "server": "cd sms-server && npm start",
+    "server:dev": "cd sms-server && npm run dev",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
+    "install:server": "cd sms-server && npm install",
+    "install:client": "cd client && npm install",
+    "install:all": "npm run install:server && npm run install:client",
+    "build": "cd client && npm run build",
+    "test": "cd sms-server && npm test",
+    "test:client": "cd client && npm test",
+    "lint": "cd sms-server && npm run lint",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "setup": "npm run install:all && npm run docker:build",
+    "setup:dev": "npm run install:all && cp .env.example .env",
+    "backup:db": "docker-compose exec mysql mysqldump -u root -p st_andrews_sms > database/backups/backup_$(date +%Y%m%d_%H%M%S).sql",
+    "restore:db": "docker-compose exec -T mysql mysql -u root -p st_andrews_sms < database/backups/",
+    "seed:db": "cd sms-server && npm run seed-db",
+    "migrate:db": "cd sms-server && npm run migrate",
+    "clean": "rm -rf node_modules sms-server/node_modules client/node_modules",
+    "clean:docker": "docker-compose down -v && docker system prune -f",
+    "logs:server": "docker-compose logs -f sms-server",
+    "logs:db": "docker-compose logs -f mysql",
+    "shell:server": "docker-compose exec sms-server sh",
+    "shell:db": "docker-compose exec mysql mysql -u root -p",
+    "monitor": "docker-compose exec sms-server npm run monitor",
+    "deploy": "npm run build && docker-compose -f docker-compose.prod.yml up -d"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/standrews/sms.git"
+  },
+  "keywords": [
+    "school-management",
+    "education",
+    "sms",
+    "student-management",
+    "academic",
+    "administration",
+    "nodejs",
+    "react",
+    "mysql",
+    "docker"
+  ],
+  "author": {
+    "name": "St. Andrews School",
+    "email": "admin@standrews.edu.gh",
+    "url": "https://standrews.edu.gh"
+  },
+  "contributors": [
+    {
+      "name": "SMS Development Team",
+      "email": "dev@standrews.edu.gh"
+    }
+  ],
   "license": "MIT",
-  "dependencies": {
-    "bcrypt": "^5.1.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "express-validator": "^6.14.2",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.8.0",
-    "nodemailer": "^6.9.1",
-    "winston": "^3.8.2"
-  },
+  "private": true,
+  "workspaces": [
+    "sms-server",
+    "client"
+  ],
   "devDependencies": {
-    "eslint": "^8.29.0",
-    "jest": "^29.5.0",
-    "nodemon": "^3.1.0",
-    "supertest": "^6.3.3"
+    "concurrently": "^8.2.0",
+    "cross-env": "^7.0.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,json,css,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "config": {
+    "mongoUrl": "mongodb://localhost:27017/st_andrews_sms"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

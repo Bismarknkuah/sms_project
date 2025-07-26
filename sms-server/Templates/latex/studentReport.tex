@@ -1,0 +1,76 @@
+\documentclass[a4paper,12pt]{article}
+% Defining document structure and layout
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{St. Andrews Senior High School}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+% Including necessary packages for text formatting and tables
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+% Adding support for multilingual text
+\usepackage{fontspec} % For XeLaTeX compatibility with non-latin fonts
+\usepackage{polyglossia}
+\setmainlanguage{english}
+% Configuring reliable fonts for various languages
+\setmainfont{Noto Serif}
+\newfontfamily\arabicfont{Amiri}[Script=Arabic]
+\newfontfamily\chinesefont{Noto Serif CJK SC}[Script=Han]
+\newfontfamily\japanesefont{Noto Serif CJK JP}[Script=Han]
+\newfontfamily\hindifont{Noto Serif Devanagari}[Script=Devanagari]
+% Ensuring table compatibility and formatting
+\usepackage{colortbl}
+\usepackage{xcolor}
+\definecolor{lightgray}{gray}{0.9}
+
+\begin{document}
+
+% Generating title and student information
+\begin{center}
+    \LARGE{\textbf{Student Academic Report}} \\
+    \vspace{0.5cm}
+    \large{Branch: <%= branch.name %>} \\
+    \vspace{0.5cm}
+    \large{Date: \today}
+\end{center}
+
+\section*{Student Details}
+\begin{itemize}
+    \item Full Name: <%= student.fullName %>
+    \item Student ID: <%= student.studentId %>
+    \item Student Type: <%= student.studentType %>
+    \item House: <%= student.houseId ? house.name : 'N/A' %>
+    \item Course: <%= course.title %>
+    \item Parent: <%= parent.fullName %>
+\end{itemize}
+
+\section*{Attendance Summary}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{3cm}|}
+    \hline
+    \rowcolor{lightgray}
+    Date & Status & Type \\
+    \hline
+    <% attendance.forEach(att => { %>
+    <%= att.date.toLocaleDateString() %> & <%= att.status %> & <%= att.studentType %> \\
+    \hline
+    <% }); %>
+\end{longtable}
+
+\section*{Financial Status}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{3cm}|>{\raggedright\arraybackslash}p{3cm}|}
+    \hline
+    \rowcolor{lightgray}
+    Transaction Type & Amount (GHS) & Status \\
+    \hline
+    <% finance.forEach(fin => { %>
+    <%= fin.transactionType %> & <%= fin.amount %> & <%= fin.status %> \\
+    \hline
+    <% }); %>
+\end{longtable}
+
+% Concluding the document
+\clearpage
+\end{document}

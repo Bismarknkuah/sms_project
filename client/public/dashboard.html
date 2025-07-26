@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - St. Andrews SMS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .dashboard-container {
+      background: white;
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      animation: slideUp 0.5s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .dashboard-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 1rem;
+    }
+    .dashboard-info p {
+      color: #6b7280;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .logout-btn {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: #ff6347;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 1.5rem;
+    }
+    .logout-btn:hover {
+      background: #e55347;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 99, 71, 0.3);
+    }
+    .error-message {
+      color: #dc2626;
+      margin-top: 1rem;
+    }
+    @media (max-width: 480px) {
+      .dashboard-container { padding: 2rem 1.5rem; }
+      .dashboard-header h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    function Dashboard() {
+      const user = JSON.parse(localStorage.getItem('user') || null);
+      let errorMessage = '';
+
+      // Simulate API call or use local data
+      if (!user) {
+        errorMessage = 'No user data found. Please log in.';
+        console.error(errorMessage);
+      } else if (!localStorage.getItem('token')) {
+        errorMessage = 'No authentication token found. Redirecting...';
+        console.error(errorMessage);
+        setTimeout(() => window.location.href = '/login.html', 2000);
+      }
+
+      const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        console.log('Logged out');
+        window.location.href = '/login.html';
+      };
+
+      const branches = [
+        { value: 'assin_fosu', label: 'Assin Fosu (Main Campus)' },
+        { value: 'accra', label: 'Accra' },
+        { value: 'dunkwa_on_offin', label: 'Dunkwa-on-Offin' },
+        { value: 'mankessim', label: 'Mankessim' },
+        { value: 'sefwi_asawinso', label: 'Sefwi Asawinso' },
+        { value: 'takoradi', label: 'Takoradi' },
+        { value: 'new_edubiase', label: 'New Edubiase' }
+      ];
+
+      return `
+        <div class="dashboard-container">
+          <div class="dashboard-header"><h1>Dashboard - St. Andrews SMS</h1></div>
+          <div class="dashboard-info">
+            <p>Logged in as: ${user?.role || 'Unknown'}</p>
+            <p>Branch: ${user?.branch ? branches.find(b => b.value === user.branch)?.label || 'N/A' : 'N/A'}</p>
+            <p>Accessed at: ${new Date().toLocaleString('en-GB', { timeZone: 'GMT' })}</p>
+            ${errorMessage ? `<p class="error-message">${errorMessage}</p>` : ''}
+          </div>
+          <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+      `;
+    }
+
+    document.getElementById('root').innerHTML = Dashboard();
+  </script>
+</body>
+</html>

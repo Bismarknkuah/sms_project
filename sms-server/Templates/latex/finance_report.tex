@@ -1,0 +1,149 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\sisetup{group-separator={,}, output-decimal-marker={.}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{St. Andrews School Management System}
+\fancyhead[R]{\today}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\definecolor{twilight}{RGB}{75,60,142}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\color{twilight}\huge\bfseries Financial Report \\ St. Andrews SMS \par}
+    \vspace{1cm}
+    {\Large\itshape Branch: All Branches \par}
+    \vspace{0.5cm}
+    {\large Generated on \today \par}
+    \vspace{2cm}
+    {\large Prepared by: Super Admin \par}
+\end{titlepage}
+
+\section*{Financial Summary}
+This report provides an overview of the financial performance for St. Andrews School Management System for the period ending \today.
+
+\subsection*{Assin Fosu}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 50000.00 \\
+    Total Expenses & 30000.00 \\
+    \midrule
+    \textbf{Net Balance} & 20000.00 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Accra}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 60000.00 \\
+    Total Expenses & 35000.00 \\
+    \midrule
+    \textbf{Net Balance} & 25000.00 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Dunkwa-on-Offin}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 40000.00 \\
+    Total Expenses & 25000.00 \\
+    \midrule
+    \textbf{Net Balance} & 15000.00 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Mankessim}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 45000.00 \\
+    Total Expenses & 28000.00 \\
+    \midrule
+    \textbf{Net Balance} & 17000.00 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Sefwi Asawinso}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 38000.00 \\
+    Total Expenses & 22000.00 \\
+    \midrule
+    \textbf{Net Balance} & 16000.00 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{Takoradi}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 55000.00 \\
+    Total Expenses & 32000.00 \\
+    \midrule
+    \textbf{Net Balance} & 23000.00 \\
+    \bottomrule
+\end{tabular}
+
+\subsection*{New Edubiase}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 42000.00 \\
+    Total Expenses & 26000.00 \\
+    \midrule
+    \textbf{Net Balance} & 16000.00 \\
+    \bottomrule
+\end{tabular}
+
+\section*{Consolidated Financial Overview}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Category} & \textbf{Amount (GHS)} \\
+    \midrule
+    Total Revenue & 250000.00 \\
+    Total Expenses & 165000.00 \\
+    \midrule
+    \textbf{Net Balance} & 85000.00 \\
+    \bottomrule
+\end{tabular}
+
+\section*{Overdue Fees by Branch}
+\begin{tabular}{l S[table-format=6.2]}
+    \toprule
+    \textbf{Branch} & \textbf{Amount (GHS)} \\
+    \midrule
+    Assin Fosu & 5000.00 \\
+    Accra & 3000.00 \\
+    Dunkwa-on-Offin & 2000.00 \\
+    Mankessim & 2500.00 \\
+    Sefwi Asawinso & 1500.00 \\
+    Takoradi & 3500.00 \\
+    New Edubiase & 2000.00 \\
+    \bottomrule
+\end{tabular}
+
+\end{document}

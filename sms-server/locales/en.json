@@ -1,0 +1,44 @@
+{
+  "welcome": "Welcome to St. Andrews Senior High School Management System",
+  "auth": {
+    "loginSuccess": "Login successful. Redirecting...",
+    "loginFailed": "Invalid username or password",
+    "unauthorized": "You are not authorized to access this resource",
+    "tokenExpired": "Your session has expired. Please log in again",
+    "logout": "You have been logged out successfully"
+  },
+  "users": {
+    "createSuccess": "User {{fullName}} created successfully",
+    "updateSuccess": "User {{fullName}} updated successfully",
+    "deleteSuccess": "User {{fullName}} deleted successfully",
+    "notFound": "User not found"
+  },
+  "students": {
+    "createSuccess": "Student {{fullName}} (ID: {{studentId}}) enrolled successfully",
+    "attendanceMarked": "Attendance marked for {{fullName}} on {{date}} as {{status}}",
+    "houseAssigned": "{{fullName}} assigned to {{houseName}}",
+    "notFound": "Student not found"
+  },
+  "houses": {
+    "createSuccess": "House {{name}} created successfully",
+    "masterAssigned": "House Master assigned to {{name}}",
+    "capacityExceeded": "House {{name}} has reached its capacity of {{capacity}}"
+  },
+  "courses": {
+    "enrollSuccess": "{{fullName}} enrolled in {{courseTitle}}",
+    "electiveAdded": "Elective {{subject}} added to {{courseTitle}}"
+  },
+  "finance": {
+    "paymentSuccess": "Payment of GHS {{amount}} for {{transactionType}} received for {{fullName}}",
+    "overdueNotice": "Payment of GHS {{amount}} for {{transactionType}} is overdue for {{fullName}}"
+  },
+  "errors": {
+    "serverError": "An internal server error occurred. Please try again later",
+    "validationError": "Validation failed: {{details}}",
+    "notFound": "Resource not found"
+  },
+  "notifications": {
+    "attendanceAlert": "Your child {{fullName}} was marked {{status}} today at {{branchName}}",
+    "feeReminder": "Fee payment of GHS {{amount}} is due by {{dueDate}} for {{fullName}} at {{branchName}}"
+  }
+}

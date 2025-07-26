@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Report - St. Andrews SHS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>St. Andrews Senior High School</h1>
+    <p>Branch: <%= branch.name %></p>
+    <p>Report Date: <%= new Date().toLocaleDateString('en-GB', { timeZone: 'GMT' }) %></p>
+  </header>
+  <main>
+    <h2>Attendance Report</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Full Name</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% attendance.forEach(att => { %>
+          <tr>
+            <td><%= att.studentId.studentId %></td>
+            <td><%= att.studentId.fullName %></td>
+            <td><%= att.date.toLocaleDateString() %></td>
+            <td><%= att.status %></td>
+            <td><%= att.studentType %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <p>Total Records: <%= attendance.length %></p>
+  </main>
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> St. Andrews SHS. All rights reserved.</p>
+  </footer>
+</body>
+</html>
